@@ -71,10 +71,10 @@
                 class="@($"{PrefixCls}-simple-pager")">
                 <input
                     type="text"
-                    value="@_currentInputValue"
+                    @bind-value="@_currentInputValue"
+                    @bind-value:event="oninput"
                     disabled="@Disabled"
                     @onkeyup="HandleKeyUp"
-                    @onchange="HandleKeyUp"
                     size="3"/>
                 <span class="@($"{PrefixCls}-slash")">/</span>
                 @allPages

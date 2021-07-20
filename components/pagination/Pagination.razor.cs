@@ -231,7 +231,7 @@ namespace AntDesign
         private int CalculatePage(int? p, int pageSize, int total)
         {
             var size = p ?? pageSize;
-            return (int)Math.Floor((double)(total - 1) / size) + 1;
+            return (total + size - 1) / size;
         }
 
         private int GetJumpPrevPage()
@@ -244,50 +244,40 @@ namespace AntDesign
             return Math.Min(CalculatePage(null, _pageSize, Total), _current + (ShowLessItems ? 3 : 5));
         }
 
-        private int GetValidValue(string inputValue)
+        private int GetValidValue()
         {
             var allPages = CalculatePage(null, _pageSize, Total);
-            var currentInputValue = _currentInputValue;
-            int value;
-            if (string.IsNullOrWhiteSpace(inputValue))
+            if (_currentInputValue > allPages)
             {
-                value = default;
+                _currentInputValue = allPages;
             }
-            else if (int.TryParse(inputValue, out var inputNumber))
+            if (_currentInputValue < 0)
             {
-                value = inputNumber >= allPages ? allPages : inputNumber;
-            }
-            else
-            {
-                value = currentInputValue;
+                _currentInputValue = 0;
             }
 
-            return value;
+            return _currentInputValue;
         }
 
         private bool IsValid(int page) => page != _current;
 
         private bool ShouldDisplayQuickJumper() => ShowQuickJumper && Total > _pageSize;
 
-        private void HandleKeyUp(EventArgs e)
+        private void HandleKeyUp(KeyboardEventArgs e)
         {
-            if (e is KeyboardEventArgs ke)
-            {
-                var value = GetValidValue(ke.Key);
-                _currentInputValue = value;
+            var value = GetValidValue();
 
-                if (ke.Key == "Enter")
-                {
-                    HandleChange(value);
-                }
-                else if (ke.Key == "ArrowUp")
-                {
-                    HandleChange(value - 1);
-                }
-                else if (ke.Key == "ArrowDown")
-                {
-                    HandleChange(value + 1);
-                }
+            if (e.Key == "Enter")
+            {
+                HandleChange(value);
+            }
+            else if (e.Key == "ArrowUp")
+            {
+                HandleChange(value - 1);
+            }
+            else if (e.Key == "ArrowDown")
+            {
+                HandleChange(value + 1);
             }
         }
 
